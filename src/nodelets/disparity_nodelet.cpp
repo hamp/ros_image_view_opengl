@@ -58,7 +58,7 @@ static void destroyNodelet(GtkWidget *widget, gpointer data)
 #endif
 
 
-namespace image_view {
+namespace image_view_opengl {
 
 class DisparityNodelet : public nodelet::Nodelet
 {
@@ -431,4 +431,4 @@ unsigned char DisparityNodelet::colormap[768] =
 
 // Register the nodelet
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS( image_view::DisparityNodelet, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS( image_view_opengl::DisparityNodelet, nodelet::Nodelet)

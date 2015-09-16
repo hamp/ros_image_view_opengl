@@ -41,7 +41,7 @@ void startWindowThreadLocal() {
 }
 }
 
-namespace image_view {
+namespace image_view_opengl {
 
 void startWindowThread()
 {
