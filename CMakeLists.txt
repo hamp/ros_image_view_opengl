@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(image_view)
+project(image_view_opengl)
 
 find_package(catkin REQUIRED)
 catkin_package()
