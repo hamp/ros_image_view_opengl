@@ -39,12 +39,14 @@
 
 ImageViewerOpenGL::ImageViewerOpenGL()
 {
+    printf("ImageViewerOpenGL constructor");
 	reset();
 }
 
 
 ImageViewerOpenGL::~ImageViewerOpenGL()
 {
+    printf("ImageViewerOpenGL destructor");
 }
 
 
@@ -98,6 +100,7 @@ QString ImageViewerOpenGL::helpString() const
 
 void ImageViewerOpenGL::draw()
 {
+//    printf("In ImageViewerOpenGL::draw()");
 	if(resetRequested)
 	{
 		reset();

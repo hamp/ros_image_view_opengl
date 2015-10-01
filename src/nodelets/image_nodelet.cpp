@@ -45,6 +45,12 @@
 #ifdef HAVE_GTK
 #include <gtk/gtk.h>
 
+#include "ImageViewerOpengl.h"
+#include <qapplication.h>
+
+ImageViewerOpenGL *viewer;
+QApplication *application;
+
 // Platform-specific workaround for #3026: image_view doesn't close when
 // closing image window. On platforms using GTK+ we connect this to the
 // window's "destroy" event so that image_view exits.
@@ -85,6 +91,7 @@ class ImageNodelet : public nodelet::Nodelet
 
   static void mouseCb(int event, int x, int y, int flags, void* param);
 
+//  static void startQGLThread();
 public:
   ImageNodelet();
 
@@ -103,8 +110,8 @@ ImageNodelet::~ImageNodelet()
 
 void ImageNodelet::onInit()
 {
-  std::cout << "checking if here";
-
+  std::cerr << "checking if here" << std::endl;
+    
   ros::NodeHandle nh = getNodeHandle();
   ros::NodeHandle local_nh = getPrivateNodeHandle();
 
@@ -160,7 +167,31 @@ void ImageNodelet::onInit()
   image_transport::ImageTransport it(nh);
   image_transport::TransportHints hints(transport, ros::TransportHints(), getPrivateNodeHandle());
   sub_ = it.subscribe(topic, 1, &ImageNodelet::imageCb, this, hints);
+  
+   
+    printf("starting QGL thread\n");
+    
+    // Read command lines arguments.
+    int argcdummy = 1;
+    char *argvdummy = "dummy";
+    application = new QApplication (argcdummy, &argvdummy);
+    
+    // Instantiate the viewer.
+    viewer = new ImageViewerOpenGL();
+    
+#if QT_VERSION < 0x040000
+    // Set the viewer as the application main widget.
+    application->setMainWidget(viewer);
+#else
+    viewer->setWindowTitle("OpenGL Viewer");
+#endif
+    
+    // Make the viewer window visible on screen.
+    viewer->show();
+
+  application->exec();
 }
+    
 
 void ImageNodelet::imageCb(const sensor_msgs::ImageConstPtr& msg)
 {

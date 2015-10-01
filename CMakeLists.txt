@@ -78,16 +78,10 @@ install(TARGETS image_view_opengl
 )
 
 # Image viewers
-add_executable(image_view_opengl_exe src/nodes/image_view.cpp src/nodelets/ImageViewerOpengl.cpp)
+add_executable(image_view_opengl_exe src/nodes/image_view.cpp)
 SET_TARGET_PROPERTIES(image_view_opengl_exe PROPERTIES OUTPUT_NAME image_view_opengl)
 target_link_libraries(image_view_opengl_exe ${catkin_LIBRARIES}
                                      ${OpenCV_LIBRARIES}
-				 ${QT_LIBRARIES}
-				 ${QGLViewer_LIBRARIES}
-			         ${QGLVIEWER_LIBRARY}
-				 ${OpenGL_LIBRARIES}
-			     	 ${OPENGL_LIBRARY}
-				 /usr/local/Cellar/glew/1.12.0/lib/libGLEW.dylib
 )
 
 add_executable(disparity_view src/nodes/disparity_view.cpp)
