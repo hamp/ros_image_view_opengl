@@ -81,6 +81,8 @@ class ImageNodelet : public nodelet::Nodelet
   
   void imageCb(const sensor_msgs::ImageConstPtr& msg);
 
+  static void onOpenGlDraw(void* param);
+
   static void mouseCb(int event, int x, int y, int flags, void* param);
 
 public:
@@ -119,8 +121,8 @@ void ImageNodelet::onInit()
       break;
     }
   }
-    NODELET_INFO_STREAM("TEST MESSAGE");
-    NODELET_INFO_STREAM("Using transport \"" << transport << "\"");
+ 
+  NODELET_INFO_STREAM("Using transport \"" << transport << "\"");
   
   // Internal option, should be used only by the image_view node
   bool shutdown_on_close = std::find(argv.begin(), argv.end(),
@@ -139,9 +141,10 @@ void ImageNodelet::onInit()
 
   cv::namedWindow(window_name_, autosize ? cv::WND_PROP_AUTOSIZE : 0);
   cv::setMouseCallback(window_name_, &ImageNodelet::mouseCb, this);
-  
-  NODELET_INFO_STREAM("TEST MESSAGE");
+
+  NODELET_INFO_STREAM("Window name: \"" << window_name_ << "\"");
     
+//  cv::setOpenGlDrawCallback(window_name_, &ImageNodelet::onOpenGlDraw, NULL);
 #ifdef HAVE_GTK
   // Register appropriate handler for when user closes the display window
   GtkWidget *widget = GTK_WIDGET( cvGetWindowHandle(window_name_.c_str()) );
@@ -189,12 +192,11 @@ void ImageNodelet::imageCb(const sensor_msgs::ImageConstPtr& msg)
 
     cv::line(last_image_, cv::Point2f(0.f, 0.f), cv::Point2f(100.f, 100.f), cv::Scalar(1.f, 0.f, 0.f, 1.f)) ;
     cv::circle(last_image_, cv::Point2f(0.f, 0.f), 20, cv::Scalar(1.f, 1.f, 1.f, 1.f), 5) ;
-    std::stringstream ss;
-    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
-    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
-
-    NODELET_INFO_STREAM(ss.str().c_str());
-                           
+//    std::stringstream ss;
+//    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
+//    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
+//    NODELET_INFO_STREAM(ss.str().c_str());
+    
   // Must release the mutex before calling cv::imshow, or can deadlock against
   // OpenCV's window mutex.
   image_mutex_.unlock();
@@ -239,8 +241,14 @@ void ImageNodelet::mouseCb(int event, int x, int y, int flags, void* param)
   }
 }
 
+void ImageNodelet::onOpenGlDraw(void* param)
+{
+    std::cout << "In OpenGL draw" << std::endl;
+}
+                            
 } // namespace image_view
 
+                            
 // Register the nodelet
 #include <pluginlib/class_list_macros.h>
 PLUGINLIB_EXPORT_CLASS( image_view_opengl::ImageNodelet, nodelet::Nodelet)

@@ -16,6 +16,17 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS}
                            ${OpenCV_INCLUDE_DIRS}
 )
 
+#For OpenGL/QGL
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+
+find_package(OpenGL REQUIRED)
+set(QT_USE_QTOPENGL TRUE)
+set(QT_USE_QTXML TRUE)
+
+find_package(QGLViewer REQUIRED)
+
+
+
 # Extra tools
 add_executable(extract_images src/nodes/extract_images.cpp)
 target_link_libraries(extract_images ${catkin_LIBRARIES}
@@ -43,25 +54,40 @@ endif()
 
 find_package(GTK2)
 add_definitions(-DHAVE_GTK)
-include_directories(SYSTEM ${GTK2_INCLUDE_DIRS})
+include_directories(SYSTEM ${GTK2_INCLUDE_DIRS}
+			  ${QGLVIEWER_INCLUDE_DIR}
+)
 
 # Nodelet library
-add_library(image_view_opengl src/nodelets/image_nodelet.cpp src/nodelets/disparity_nodelet.cpp src/nodelets/window_thread.cpp)
+add_library(image_view_opengl src/nodelets/image_nodelet.cpp src/nodelets/disparity_nodelet.cpp src/nodelets/window_thread.cpp src/nodelets/ImageViewerOpengl.cpp)
 target_link_libraries(image_view_opengl ${catkin_LIBRARIES}
                                  ${GTK_LIBRARIES}
                                  ${GTK2_LIBRARIES}
                                  ${OpenCV_LIBRARIES}
                                  ${Boost_LIBRARIES}
+				 ${QT_LIBRARIES}
+				 ${QGLViewer_LIBRARIES}
+			         ${QGLVIEWER_LIBRARY}
+				 ${OpenGL_LIBRARIES}
+			     	 ${OPENGL_LIBRARY}
+				 /usr/local/Cellar/glew/1.12.0/lib/libGLEW.dylib
+			     
 )
 install(TARGETS image_view_opengl
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 # Image viewers
-add_executable(image_view_opengl_exe src/nodes/image_view.cpp)
+add_executable(image_view_opengl_exe src/nodes/image_view.cpp src/nodelets/ImageViewerOpengl.cpp)
 SET_TARGET_PROPERTIES(image_view_opengl_exe PROPERTIES OUTPUT_NAME image_view_opengl)
 target_link_libraries(image_view_opengl_exe ${catkin_LIBRARIES}
                                      ${OpenCV_LIBRARIES}
+				 ${QT_LIBRARIES}
+				 ${QGLViewer_LIBRARIES}
+			         ${QGLVIEWER_LIBRARY}
+				 ${OpenGL_LIBRARIES}
+			     	 ${OPENGL_LIBRARY}
+				 /usr/local/Cellar/glew/1.12.0/lib/libGLEW.dylib
 )
 
 add_executable(disparity_view src/nodes/disparity_view.cpp)

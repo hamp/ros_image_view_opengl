@@ -33,6 +33,10 @@
 *********************************************************************/
 #include <ros/ros.h>
 #include <nodelet/loader.h>
+#include "../nodelets/ImageViewerOpengl.h"
+#include <qapplication.h>
+
+ImageViewerOpenGL *viewer;
 
 int main(int argc, char **argv)
 {
@@ -49,6 +53,26 @@ int main(int argc, char **argv)
 
   manager.load(ros::this_node::getName(), "image_view_opengl/image", remappings, my_argv);
 
-  ros::spin();
+    
+    printf("Starting QApplication thread\n");
+    // Read command lines arguments.
+    QApplication application(argc, argv);
+    
+    // Instantiate the viewer.
+    viewer = new ImageViewerOpenGL();
+    
+    
+#if QT_VERSION < 0x040000
+    // Set the viewer as the application main widget.
+    application.setMainWidget(viewer);
+#else
+    viewer->setWindowTitle("PointCloud Viewer");
+#endif
+    
+    // Make the viewer window visible on screen.
+    viewer->show();
+
+    ros::spin();
+
   return 0;
 }
