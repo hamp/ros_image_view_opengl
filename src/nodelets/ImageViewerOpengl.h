@@ -25,6 +25,7 @@ public:
 //	void addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg);
 //	void addGraphMsg(lsd_slam_viewer::keyframeGraphMsgConstPtr msg);
 
+    void SetRotTest(float value);
 
 protected :
 	virtual void draw();
@@ -41,6 +42,8 @@ private:
 
 	void setToVideoSize();
 	bool resetRequested;
+    
+    float _rotVal;
 };
 
 

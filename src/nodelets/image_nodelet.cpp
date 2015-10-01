@@ -233,6 +233,10 @@ void ImageNodelet::imageCb(const sensor_msgs::ImageConstPtr& msg)
   image_mutex_.unlock();
   if (!last_image_.empty())
     cv::imshow(window_name_, last_image_);
+    
+    static int cntr = 0;
+    if (viewer != NULL)
+        viewer->SetRotTest(cntr++*10.f);
 }
 
 void ImageNodelet::mouseCb(int event, int x, int y, int flags, void* param)
