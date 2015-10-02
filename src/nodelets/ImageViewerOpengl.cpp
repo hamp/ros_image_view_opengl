@@ -24,6 +24,7 @@
 #include "qcoreapplication.h"
 #include <stdio.h>
 
+
 #include <zlib.h>
 #include <iostream>
 
@@ -107,6 +108,7 @@ QString ImageViewerOpenGL::helpString() const
 }
 
 
+GLuint texId = 0;
 void ImageViewerOpenGL::draw()
 {
 //    printf("In ImageViewerOpenGL::draw()");
@@ -116,6 +118,11 @@ void ImageViewerOpenGL::draw()
 		resetRequested = false;
 	}
 
+    if (_webCamMat != NULL)
+    {
+        texId = matToTexture(*_webCamMat, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
+        printf("new texId: %d \n", texId);
+    }
 
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
     glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
@@ -125,14 +132,35 @@ void ImageViewerOpenGL::draw()
     glPushMatrix();
     glTranslatef(1.5f, 0.0f, -7.0f);  // Move right and into the screen
     
+    glEnable(GL_TEXTURE_2D);
+    
+    // Quad width and height
+    float w = 6.4f;
+    float h = 4.8f;
+    
+    // Draw the textures
+    // Note: Window co-ordinates origin is top left, texture co-ordinate origin is bottom left.
+    
+    // Front facing texture
+    glBindTexture(GL_TEXTURE_2D, texId);
+    
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
-    glColor3f(0.0f, 1.0f, 0.0f);     // Green
+    glColor3f(1.0f, 1.0f, 1.0f);     // Green
+    glTexCoord2f(1, 1);
     glVertex3f( 1.0f, 1.0f, -1.0f);
+    glTexCoord2f(0, 1);
     glVertex3f(-1.0f, 1.0f, -1.0f);
+    glTexCoord2f(0, 0);
     glVertex3f(-1.0f, 1.0f,  1.0f);
+    glTexCoord2f(1, 0);
     glVertex3f( 1.0f, 1.0f,  1.0f);
+    
+    // Free the texture memory
+    glDeleteTextures(1, &texId);
+    
+    glDisable(GL_TEXTURE_2D);
     
     // Bottom face (y = -1.0f)
     glColor3f(1.0f, 0.5f, 0.0f);     // Orange
@@ -287,5 +315,70 @@ void ImageViewerOpenGL::SetRotTest(float value)
 {
     _rotVal = value;
 //    printf ("rotval: %f", _rotVal);
+}
+
+GLuint ImageViewerOpenGL::matToTexture(cv::Mat &mat, GLenum minFilter, GLenum magFilter, GLenum wrapFilter)
+{
+    // Generate a number for our textureID's unique handle
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    
+    // Bind to our texture handle
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    // Catch silly-mistake texture interpolation method for magnification
+    if (magFilter == GL_LINEAR_MIPMAP_LINEAR  ||
+        magFilter == GL_LINEAR_MIPMAP_NEAREST ||
+        magFilter == GL_NEAREST_MIPMAP_LINEAR ||
+        magFilter == GL_NEAREST_MIPMAP_NEAREST)
+    {
+        std::cout << "You can't use MIPMAPs for magnification - setting filter to GL_LINEAR" << std::endl;
+        magFilter = GL_LINEAR;
+    }
+    
+    // Set texture interpolation methods for minification and magnification
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    
+    // Set texture clamping method
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapFilter);
+    
+    // Set incoming texture format to:
+    // GL_BGR       for CV_CAP_OPENNI_BGR_IMAGE,
+    // GL_LUMINANCE for CV_CAP_OPENNI_DISPARITY_MAP,
+    // Work out other mappings as required ( there's a list in comments in main() )
+    GLenum inputColourFormat = GL_BGR;
+    if (mat.channels() == 1)
+    {
+        inputColourFormat = GL_LUMINANCE;
+    }
+    
+    // Create the texture
+    glTexImage2D(GL_TEXTURE_2D,     // Type of texture
+                 0,                 // Pyramid level (for mip-mapping) - 0 is the top level
+                 GL_RGB,            // Internal colour format to convert to
+                 mat.cols,          // Image width  i.e. 640 for Kinect in standard mode
+                 mat.rows,          // Image height i.e. 480 for Kinect in standard mode
+                 0,                 // Border width in pixels (can either be 1 or 0)
+                 inputColourFormat, // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+                 GL_UNSIGNED_BYTE,  // Image data type
+                 mat.ptr());        // The actual image data itself
+    
+    // If we're using mipmaps then generate them. Note: This requires OpenGL 3.0 or higher
+    if (minFilter == GL_LINEAR_MIPMAP_LINEAR  ||
+        minFilter == GL_LINEAR_MIPMAP_NEAREST ||
+        minFilter == GL_NEAREST_MIPMAP_LINEAR ||
+        minFilter == GL_NEAREST_MIPMAP_NEAREST)
+    {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    
+    return textureID;
+}
+
+void ImageViewerOpenGL::SetWebcamMat(cv::Mat *mat)
+{
+    _webCamMat = mat;
 }
 

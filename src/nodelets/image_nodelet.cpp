@@ -236,7 +236,10 @@ void ImageNodelet::imageCb(const sensor_msgs::ImageConstPtr& msg)
     
     static int cntr = 0;
     if (viewer != NULL)
+    {
         viewer->SetRotTest(cntr++*10.f);
+        viewer->SetWebcamMat(&last_image_);
+    }
 }
 
 void ImageNodelet::mouseCb(int event, int x, int y, int flags, void* param)

@@ -8,6 +8,8 @@
 #include "boost/thread.hpp"
 #include "qevent.h"
 
+#include <opencv2/opencv.hpp>
+
 #include "QGLViewer/keyFrameInterpolator.h"
 
 class QApplication;
@@ -26,6 +28,7 @@ public:
 //	void addGraphMsg(lsd_slam_viewer::keyframeGraphMsgConstPtr msg);
 
     void SetRotTest(float value);
+    void SetWebcamMat(cv::Mat *mat);
 
 protected :
 	virtual void draw();
@@ -36,6 +39,7 @@ protected :
 
 //	virtual void drawText(int x, int y, const QString & text, const QFont & fnt) {printf(text.toStdString().c_str());};
 
+    GLuint matToTexture(cv::Mat &mat, GLenum minFilter, GLenum magFilter, GLenum wrapFilter);
 
 private:
 
@@ -44,6 +48,7 @@ private:
 	bool resetRequested;
     
     float _rotVal;
+    cv::Mat *_webCamMat;
 };
 
 
