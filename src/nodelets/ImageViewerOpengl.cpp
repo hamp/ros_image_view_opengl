@@ -40,14 +40,14 @@
 
 ImageViewerOpenGL::ImageViewerOpenGL()
 {
-    printf("ImageViewerOpenGL constructor");
+    printf("ImageViewerOpenGL constructor\n");
 	reset();
 }
 
 
 ImageViewerOpenGL::~ImageViewerOpenGL()
 {
-    printf("ImageViewerOpenGL destructor");
+    printf("ImageViewerOpenGL destructor\n");
 }
 
 
@@ -57,12 +57,14 @@ void ImageViewerOpenGL::reset()
 	setTextIsEnabled(false);
 }
 
-//void ImageViewerOpenGL::addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg)
-//{
+void ImageViewerOpenGL::addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg)
+{
 //	meddleMutex.lock();
-//
-//	if(!msg->isKeyframe)
-//	{
+
+    printf("In ImageViewerOpenGL::addFrameMsg\n");
+
+	if(!msg->isKeyframe)
+	{
 //		if(currentCamDisplay->id > msg->id)
 //		{
 //			printf("detected backward-jump in id (%d to %d), resetting!\n", currentCamDisplay->id, msg->id);
@@ -71,13 +73,35 @@ void ImageViewerOpenGL::reset()
 //		currentCamDisplay->setFrom(msg);
 //		lastAnimTime = lastCamTime = msg->time;
 //		lastCamID = msg->id;
-//	}
+        // copy over campose.
+        memcpy(camToWorld.data(), msg->camToWorld.data(), 7*sizeof(float));
+        
+        fx = msg->fx;
+        fy = msg->fy;
+        cx = msg->cx;
+        cy = msg->cy;
+        
+        fxi = 1/fx;
+        fyi = 1/fy;
+        cxi = -cx / fx;
+        cyi = -cy / fy;
+        
+        width = msg->width;
+        height = msg->height;
+        id = msg->id;
+        time = msg->time;
+        
+        printf("Cam translation: (%f, %f, %f)\n", camToWorld.translation().x(),
+               camToWorld.translation().y(), camToWorld.translation().z());
+//        glBuffersValid = false;
+
+	}
 //	else
 //		graphDisplay->addMsg(msg);
-//
+
 //	meddleMutex.unlock();
-//}
-//
+}
+
 //void ImageViewerOpenGL::addGraphMsg(lsd_slam_viewer::keyframeGraphMsgConstPtr msg)
 //{
 //	meddleMutex.lock();
@@ -121,7 +145,7 @@ void ImageViewerOpenGL::draw()
     if (_webCamMat != NULL)
     {
         texId = matToTexture(*_webCamMat, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
-        printf("new texId: %d \n", texId);
+//        printf("new texId: %d \n", texId);
     }
 
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
@@ -171,9 +195,13 @@ void ImageViewerOpenGL::draw()
     
     // Front face  (z = 1.0f)
     glColor3f(1.0f, 0.0f, 0.0f);     // Red
+    glTexCoord2f(1, 1);
     glVertex3f( 1.0f,  1.0f, 1.0f);
+    glTexCoord2f(0, 1);
     glVertex3f(-1.0f,  1.0f, 1.0f);
+    glTexCoord2f(0, 0);
     glVertex3f(-1.0f, -1.0f, 1.0f);
+    glTexCoord2f(1, 0);
     glVertex3f( 1.0f, -1.0f, 1.0f);
     
     // Back face (z = -1.0f)

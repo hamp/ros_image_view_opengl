@@ -12,6 +12,13 @@
 
 #include "QGLViewer/keyFrameInterpolator.h"
 
+#include "lsd_slam_viewer/keyframeMsg.h"
+
+#include "Eigen/Core"
+
+#include "sophus/sim3.hpp"
+
+
 class QApplication;
 
 
@@ -24,7 +31,7 @@ public:
 
 	void reset();
 
-//	void addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg);
+	void addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg);
 //	void addGraphMsg(lsd_slam_viewer::keyframeGraphMsgConstPtr msg);
 
     void SetRotTest(float value);
@@ -49,6 +56,21 @@ private:
     
     float _rotVal;
     cv::Mat *_webCamMat;
+    
+    
+    // camera pose
+    // may be updated by kf-graph.
+    Sophus::Sim3f camToWorld;
+    
+    // camera parameter
+    // fixed.
+    float fx,fy,cx,cy;
+    float fxi,fyi,cxi,cyi;
+    int width, height;
+
+    int id;
+    double time;
+
 };
 
 

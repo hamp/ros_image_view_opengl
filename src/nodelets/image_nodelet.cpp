@@ -108,6 +108,30 @@ ImageNodelet::~ImageNodelet()
   cv::destroyWindow(window_name_);
 }
 
+void frameCb(lsd_slam_viewer::keyframeMsgConstPtr msg)
+{
+    printf("In frameCb\n");
+   if(viewer != 0)
+       viewer->addFrameMsg(msg);
+}
+    
+void rosThreadFn()
+{
+    printf("In frosThreadFn\n");
+    ros::NodeHandle nh2;
+    
+    ros::Subscriber liveFrames_sub = nh2.subscribe(nh2.resolveName("lsd_slam/liveframes"),1, frameCb);
+    ros::Subscriber keyFrames_sub = nh2.subscribe(nh2.resolveName("lsd_slam/keyframes"),20, frameCb);
+
+    ros::spin();
+    
+    ros::shutdown();
+    
+    printf("Exiting ROS thread\n");
+    
+    exit(1);
+}
+
 void ImageNodelet::onInit()
 {
   std::cerr << "checking if here" << std::endl;
@@ -189,6 +213,8 @@ void ImageNodelet::onInit()
     // Make the viewer window visible on screen.
     viewer->show();
 
+    boost::thread rosThread(rosThreadFn);
+    
   application->exec();
 }
     

@@ -14,6 +14,7 @@ find_package(catkin REQUIRED camera_calibration_parsers cv_bridge image_transpor
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS}
                            ${catkin_INCLUDE_DIRS}
                            ${OpenCV_INCLUDE_DIRS}
+			   ./include
 )
 
 #For OpenGL/QGL
@@ -24,7 +25,7 @@ set(QT_USE_QTOPENGL TRUE)
 set(QT_USE_QTXML TRUE)
 
 find_package(QGLViewer REQUIRED)
-
+find_package(Eigen3 REQUIRED)
 
 
 # Extra tools
@@ -56,6 +57,8 @@ find_package(GTK2)
 add_definitions(-DHAVE_GTK)
 include_directories(SYSTEM ${GTK2_INCLUDE_DIRS}
 			  ${QGLVIEWER_INCLUDE_DIR}
+			  /usr/local/include/eigen3
+			  ${EIGEN_INCLUDE_DIR}
 )
 
 # Nodelet library
