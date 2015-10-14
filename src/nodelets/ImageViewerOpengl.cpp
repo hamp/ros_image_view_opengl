@@ -223,84 +223,104 @@ void ImageViewerOpenGL::draw()
 //    drawFullScreenTex();
 //    return;
 
-    GLfloat cameraMatrix[16];
+    GLdouble cameraMatrix[16];
     camera()->getModelViewMatrix(cameraMatrix);
     printf("Cam translation: (%f, %f, %f)\n", cameraMatrix[12],
            cameraMatrix[13], cameraMatrix[14]);
+    
+    cameraMatrix[0] = cameraMatrix[5] = cameraMatrix[10] = cameraMatrix[15] = 1.f;
+    cameraMatrix[1] = cameraMatrix[2] = cameraMatrix[3] = cameraMatrix[6] = cameraMatrix[7] = cameraMatrix[8] = cameraMatrix[9] = 0.f;
+    cameraMatrix[11] = 0.f;
+    cameraMatrix[12] = 0.f;
+    cameraMatrix[13] = 0.f;
+    cameraMatrix[14] = 0.f;
 
+    camera()->setFromModelViewMatrix(cameraMatrix);
+    
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
     glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
 
     // Render a color-cube consisting of 6 quads with different colors
 //    glLoadIdentity();                 // Reset the model-view matrix
     glPushMatrix();
-    glTranslatef(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
-    glTranslatef(0.f, 0.0f, -75.0f);  // Move right and into the screen
+//    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
+    glTranslatef(0.f, 0.0f, -80.0f);
     
     glEnable(GL_TEXTURE_2D);
-    
-    // Quad width and height
-    float w = 6.4f;
-    float h = 4.8f;
-    
-    // Draw the textures
+    // Draw the webcam texture
     // Note: Window co-ordinates origin is top left, texture co-ordinate origin is bottom left.
     
     // Front facing texture
     glBindTexture(GL_TEXTURE_2D, texId);
     
-    glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
-    // Top face (y = 1.0f)
-    // Define vertices in counter-clockwise (CCW) order with normal pointing out
-//    glColor3f(1.0f, 1.0f, 1.0f);     // Green
-//    glTexCoord2f(1, 1);
-//    glVertex3f( 1.0f, 1.0f, -1.0f);
-//    glTexCoord2f(0, 1);
-//    glVertex3f(-1.0f, 1.0f, -1.0f);
-//    glTexCoord2f(0, 0);
-//    glVertex3f(-1.0f, 1.0f,  1.0f);
-//    glTexCoord2f(1, 0);
-//    glVertex3f( 1.0f, 1.0f,  1.0f);
-//    
-//    // Bottom face (y = -1.0f)
-//    glColor3f(1.0f, 0.5f, 0.0f);     // Orange
-//    glVertex3f( 1.0f, -1.0f,  1.0f);
-//    glVertex3f(-1.0f, -1.0f,  1.0f);
-//    glVertex3f(-1.0f, -1.0f, -1.0f);
-//    glVertex3f( 1.0f, -1.0f, -1.0f);
-    
+    glBegin(GL_QUADS);                // Begin drawing the webcam texture
     float a = 10.f;
     // Front face  (z = 1.0f)
     glColor3f(1.f, 1.f, 1.f);     // White
     glTexCoord2f(1, 0);
-    glVertex3f( a*4,  a*3, a);
+    glVertex3f( a*4,  a*3, a);//Expecting 4:3 aspect ratio
     glTexCoord2f(0, 0);
     glVertex3f(-a*4,  a*3, a);
     glTexCoord2f(0, 1);
     glVertex3f(-a*4, -a*3, a);
     glTexCoord2f(1, 1);
     glVertex3f( a*4, -a*3, a);
+    glEnd();
+
+    glPopMatrix();
     
-//    // Back face (z = -1.0f)
-//    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
-//    glVertex3f( 1.0f, -1.0f, -1.0f);
-//    glVertex3f(-1.0f, -1.0f, -1.0f);
-//    glVertex3f(-1.0f,  1.0f, -1.0f);
-//    glVertex3f( 1.0f,  1.0f, -1.0f);
-//    
-//    // Left face (x = -1.0f)
-//    glColor3f(0.0f, 0.0f, 1.0f);     // Blue
-//    glVertex3f(-1.0f,  1.0f,  1.0f);
-//    glVertex3f(-1.0f,  1.0f, -1.0f);
-//    glVertex3f(-1.0f, -1.0f, -1.0f);
-//    glVertex3f(-1.0f, -1.0f,  1.0f);
-//    
-//    // Right face (x = 1.0f)
-//    glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-//    glVertex3f(1.0f,  1.0f, -1.0f);
-//    glVertex3f(1.0f,  1.0f,  1.0f);
-//    glVertex3f(1.0f, -1.0f,  1.0f);
-//    glVertex3f(1.0f, -1.0f, -1.0f);
+    
+    //Draw object
+    
+    glPushMatrix();
+    //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
+//    glLoadMatrixd(cameraMatrix);
+    glTranslatef(0.f, 0.0f, -7.0f);
+    glRotatef(33.f, 0.f, 1.f, 0.f);
+
+    glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
+    // Top face (y = 1.0f)
+    // Define vertices in counter-clockwise (CCW) order with normal pointing out
+    glColor3f(1.0f, 1.0f, 1.0f);     // Green
+    glVertex3f( 1.0f, 1.0f, -1.0f);
+    glVertex3f(-1.0f, 1.0f, -1.0f);
+    glVertex3f(-1.0f, 1.0f,  1.0f);
+    glVertex3f( 1.0f, 1.0f,  1.0f);
+    
+    // Bottom face (y = -1.0f)
+    glColor3f(1.0f, 0.5f, 0.0f);     // Orange
+    glVertex3f( 1.0f, -1.0f,  1.0f);
+    glVertex3f(-1.0f, -1.0f,  1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f( 1.0f, -1.0f, -1.0f);
+    
+    // Front face  (z = 1.0f)
+    glColor3f(1.f, 1.f, 1.f);     // White
+    glVertex3f( 1,  1, 1);
+    glVertex3f(-1,  1, 1);
+    glVertex3f(-1, -1, 1);
+    glVertex3f(1, -1, 1);
+    
+    // Back face (z = -1.0f)
+    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
+    glVertex3f( 1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f,  1.0f, -1.0f);
+    glVertex3f( 1.0f,  1.0f, -1.0f);
+
+    // Left face (x = -1.0f)
+    glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+    glVertex3f(-1.0f,  1.0f,  1.0f);
+    glVertex3f(-1.0f,  1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f, -1.0f);
+    glVertex3f(-1.0f, -1.0f,  1.0f);
+    
+    // Right face (x = 1.0f)
+    glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
+    glVertex3f(1.0f,  1.0f, -1.0f);
+    glVertex3f(1.0f,  1.0f,  1.0f);
+    glVertex3f(1.0f, -1.0f,  1.0f);
+    glVertex3f(1.0f, -1.0f, -1.0f);
 
     glEnd();  // End of drawing color-cube
     glPopMatrix();
