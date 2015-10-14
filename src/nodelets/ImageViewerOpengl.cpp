@@ -128,6 +128,7 @@ void ImageViewerOpenGL::init()
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
     
     camera()->setFieldOfView(70.f * 3.1416 / 180.f);
+    camera()->setZNearCoefficient(0.001f);
 }
 
 QString ImageViewerOpenGL::helpString() const
@@ -221,14 +222,14 @@ void ImageViewerOpenGL::draw()
     
     float translationOffset[] = {0.f, -1.f, -1.5f};
     translationOffset[0] -= camToWorld.translation().x()*1.f;
-    translationOffset[1] -= camToWorld.translation().y()*1.f;
-    translationOffset[2] -= camToWorld.translation().z()*1.f;
+    translationOffset[1] += camToWorld.translation().y()*1.f;
+    translationOffset[2] += camToWorld.translation().z()*1.f;
 
     glRotatef(35.f, 1.f, 0.f, 0.f);
     glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
 
     //Local Rot
-    glRotatef(0.f, 0.f, 1.f, 0.f);
+    glRotatef(33.f, 0.f, 1.f, 0.f);
 
     float cubeWidth = 0.5f;
     float cubeHeight = 0.5f;
@@ -236,7 +237,7 @@ void ImageViewerOpenGL::draw()
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
-    glColor3f(1.0f, 1.0f, 1.0f);     // Green
+    glColor3f(0.9f, 0.9f, 0.9f);     // Green
     glVertex3f( cubeWidth, cubeHeight, -cubeDepth);
     glVertex3f(-cubeWidth, cubeHeight, -cubeDepth);
     glVertex3f(-cubeWidth, cubeHeight,  cubeDepth);
@@ -264,7 +265,7 @@ void ImageViewerOpenGL::draw()
     glVertex3f( cubeWidth,  cubeHeight, -cubeDepth);
 
     // Left face (x = -1.0f)
-    glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+    glColor3f(1.0f, 1.0f, 1.0f);     // Blue
     glVertex3f(-cubeWidth,  cubeHeight,  cubeDepth);
     glVertex3f(-cubeWidth,  cubeHeight, -cubeDepth);
     glVertex3f(-cubeWidth, -cubeHeight, -cubeDepth);
