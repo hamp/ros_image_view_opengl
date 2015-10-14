@@ -50,7 +50,8 @@ protected :
 
 private:
 
-
+    virtual void drawFullScreenTex();
+    
 	void setToVideoSize();
 	bool resetRequested;
     

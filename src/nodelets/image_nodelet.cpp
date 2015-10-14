@@ -247,8 +247,8 @@ void ImageNodelet::imageCb(const sensor_msgs::ImageConstPtr& msg)
     }
   }
 
-    cv::line(last_image_, cv::Point2f(0.f, 0.f), cv::Point2f(100.f, 100.f), cv::Scalar(1.f, 0.f, 0.f, 1.f)) ;
-    cv::circle(last_image_, cv::Point2f(0.f, 0.f), 20, cv::Scalar(1.f, 1.f, 1.f, 1.f), 5) ;
+//    cv::line(last_image_, cv::Point2f(0.f, 0.f), cv::Point2f(100.f, 100.f), cv::Scalar(1.f, 0.f, 0.f, 1.f)) ;
+//    cv::circle(last_image_, cv::Point2f(0.f, 0.f), 20, cv::Scalar(1.f, 1.f, 1.f, 1.f), 5) ;
 //    std::stringstream ss;
 //    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
 //    ss << "img size: " << last_image_.cols << "x" << last_image_.rows << std::endl;
