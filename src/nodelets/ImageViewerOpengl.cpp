@@ -111,6 +111,7 @@ void ImageViewerOpenGL::addFrameMsg(lsd_slam_viewer::keyframeMsgConstPtr msg)
 //	meddleMutex.unlock();
 //}
 
+GLfloat diffuseMaterial[4] = { 0.5, 0.5, 0.5, 1.0 };
 
 void ImageViewerOpenGL::init()
 {
@@ -125,7 +126,8 @@ void ImageViewerOpenGL::init()
     glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
     glShadeModel(GL_SMOOTH);   // Enable smooth shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
-
+    
+    camera()->setFieldOfView(70.f * 3.1416 / 180.f);
 }
 
 QString ImageViewerOpenGL::helpString() const
@@ -154,7 +156,7 @@ void ImageViewerOpenGL::draw()
         texId = matToTexture(*_webCamMat, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
 //        printf("new texId: %d \n", texId);
     }
-    
+
 //    drawFullScreenTex();
 //    return;
 
@@ -181,7 +183,7 @@ void ImageViewerOpenGL::draw()
 //    glPushMatrix();
     glLoadIdentity();
 //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
-    glTranslatef(0.f, 0.0f, -80.0f);
+    glTranslatef(0.f, 0.0f, -52.0f);
     
     glEnable(GL_TEXTURE_2D);
     // Draw the webcam texture
@@ -204,69 +206,79 @@ void ImageViewerOpenGL::draw()
     glVertex3f( a*4, -a*3, a);
     glEnd();
 
+    glDisable(GL_TEXTURE_2D);
+    
+//    // Free the texture memory
+//    glDeleteTextures(1, &texId);
+
 //    glPopMatrix();
     
     
     //Draw object
-    
-//    glPushMatrix();
-        glLoadIdentity();
-    //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
+    glPushMatrix();
+    glLoadIdentity();
 //    glLoadMatrixd(cameraMatrix);
     
-    float translationOffset[] = {0.f, 0.f, -5.f};
-    translationOffset[0] += camToWorld.translation().x()*10.f;
-    translationOffset[1] += camToWorld.translation().x()*10.f;
-    translationOffset[2] += camToWorld.translation().x()*10.f;
-    glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
-    glRotatef(33.f, 0.f, 1.f, 0.f);
+    float translationOffset[] = {0.f, -1.f, -1.5f};
+    translationOffset[0] -= camToWorld.translation().x()*1.f;
+    translationOffset[1] -= camToWorld.translation().y()*1.f;
+    translationOffset[2] -= camToWorld.translation().z()*1.f;
 
+    glRotatef(35.f, 1.f, 0.f, 0.f);
+    glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
+
+    //Local Rot
+    glRotatef(0.f, 0.f, 1.f, 0.f);
+
+    float cubeWidth = 0.5f;
+    float cubeHeight = 0.5f;
+    float cubeDepth = 0.5f;
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
     glColor3f(1.0f, 1.0f, 1.0f);     // Green
-    glVertex3f( 1.0f, 1.0f, -1.0f);
-    glVertex3f(-1.0f, 1.0f, -1.0f);
-    glVertex3f(-1.0f, 1.0f,  1.0f);
-    glVertex3f( 1.0f, 1.0f,  1.0f);
+    glVertex3f( cubeWidth, cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth, cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth, cubeHeight,  cubeDepth);
+    glVertex3f( cubeWidth, cubeHeight,  cubeDepth);
     
     // Bottom face (y = -1.0f)
     glColor3f(1.0f, 0.5f, 0.0f);     // Orange
-    glVertex3f( 1.0f, -1.0f,  1.0f);
-    glVertex3f(-1.0f, -1.0f,  1.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glVertex3f( 1.0f, -1.0f, -1.0f);
+    glVertex3f( cubeWidth, -cubeHeight,  cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight,  cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight, -cubeDepth);
+    glVertex3f( cubeWidth, -cubeHeight, -cubeDepth);
     
     // Front face  (z = 1.0f)
-    glColor3f(1.f, 1.f, 1.f);     // White
-    glVertex3f( 1,  1, 1);
-    glVertex3f(-1,  1, 1);
-    glVertex3f(-1, -1, 1);
-    glVertex3f(1, -1, 1);
+    glColor3f(0.5f, 0.5f, 0.5f);     // White
+    glVertex3f( cubeWidth,  cubeHeight, cubeDepth);
+    glVertex3f(-cubeWidth,  cubeHeight, cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight, cubeDepth);
+    glVertex3f(cubeWidth, -cubeHeight, cubeDepth);
     
     // Back face (z = -1.0f)
     glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
-    glVertex3f( 1.0f, -1.0f, -1.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glVertex3f(-1.0f,  1.0f, -1.0f);
-    glVertex3f( 1.0f,  1.0f, -1.0f);
+    glVertex3f( cubeWidth, -cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth,  cubeHeight, -cubeDepth);
+    glVertex3f( cubeWidth,  cubeHeight, -cubeDepth);
 
     // Left face (x = -1.0f)
     glColor3f(0.0f, 0.0f, 1.0f);     // Blue
-    glVertex3f(-1.0f,  1.0f,  1.0f);
-    glVertex3f(-1.0f,  1.0f, -1.0f);
-    glVertex3f(-1.0f, -1.0f, -1.0f);
-    glVertex3f(-1.0f, -1.0f,  1.0f);
+    glVertex3f(-cubeWidth,  cubeHeight,  cubeDepth);
+    glVertex3f(-cubeWidth,  cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight, -cubeDepth);
+    glVertex3f(-cubeWidth, -cubeHeight,  cubeDepth);
     
     // Right face (x = 1.0f)
     glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-    glVertex3f(1.0f,  1.0f, -1.0f);
-    glVertex3f(1.0f,  1.0f,  1.0f);
-    glVertex3f(1.0f, -1.0f,  1.0f);
-    glVertex3f(1.0f, -1.0f, -1.0f);
+    glVertex3f(cubeWidth,  cubeHeight, -cubeDepth);
+    glVertex3f(cubeWidth,  cubeHeight,  cubeDepth);
+    glVertex3f(cubeWidth, -cubeHeight,  cubeDepth);
+    glVertex3f(cubeWidth, -cubeHeight, -cubeDepth);
 
     glEnd();  // End of drawing color-cube
-//    glPopMatrix();
+    glPopMatrix();
 
     
 //    // Render a pyramid consists of 4 triangles
@@ -308,12 +320,6 @@ void ImageViewerOpenGL::draw()
 //    glVertex3f(-1.0f,-1.0f, 1.0f);
 //    glEnd();   // Done drawing the pyramid
 //    glPopMatrix();
-    
-    glDisable(GL_TEXTURE_2D);
-
-    // Free the texture memory
-    glDeleteTextures(1, &texId);
-
 }
 
 void ImageViewerOpenGL::keyReleaseEvent(QKeyEvent *e)
