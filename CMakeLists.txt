@@ -27,6 +27,7 @@ set(QT_USE_QTXML TRUE)
 find_package(QGLViewer REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+set(Assimp_SOURCE_DIR /Users/kaushikdas/Work/Development/assimp-3.1.1)
 
 # Extra tools
 add_executable(extract_images src/nodes/extract_images.cpp)
@@ -59,6 +60,8 @@ include_directories(SYSTEM ${GTK2_INCLUDE_DIRS}
 			  ${QGLVIEWER_INCLUDE_DIR}
 			  /usr/local/include/eigen3
 			  ${EIGEN_INCLUDE_DIR}
+	${Assimp_SOURCE_DIR}/include
+	${Assimp_SOURCE_DIR}/code
 )
 
 # Nodelet library
@@ -74,6 +77,7 @@ target_link_libraries(image_view_opengl ${catkin_LIBRARIES}
 				 ${OpenGL_LIBRARIES}
 			     	 ${OPENGL_LIBRARY}
 				 /usr/local/Cellar/glew/1.12.0/lib/libGLEW.dylib
+				/Users/kaushikdas/Work/Development/assimp-3.1.1/build/code/libassimp.dylib
 			     
 )
 install(TARGETS image_view_opengl
