@@ -137,72 +137,7 @@ GLuint texId = 0;
 
 void ImageViewerOpenGL::drawFullScreenTex()
 {
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//    
-//    glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
-//
-//    glLoadIdentity();
-//    // Render a color-cube consisting of 6 quads with different colors
-//    //    glLoadIdentity();                 // Reset the model-view matrix
-//    glPushMatrix();
-//
-//    int nWidth = 320;
-//    int nHeight = 240;
-//    glOrtho(0, nWidth, 0, nHeight, -1, 1);
-//    
-//    // Front facing texture
-//    glBindTexture(GL_TEXTURE_2D, texId);
-//
-//    glBegin(GL_QUADS);
-//    glTexCoord2f(0.0f,1.0f);
-//    glVertex2i(0,nHeight-1);
-//    glTexCoord2f(0.0f,0.0f);
-//    glVertex2i(0,0);
-//    glTexCoord2f(1.0f,0.0f);
-//    glVertex2i(nWidth-1,0);
-//    glTexCoord2f(1.0f,1.0f);
-//    glVertex2i(nWidth-1,nHeight-1);
-//    glEnd();
-//    
-//    // Free the texture memory
-//    glDeleteTextures(1, &texId);
-    
-//    glPushAttrib( GL_TEXTURE_BIT | GL_DEPTH_TEST | GL_LIGHTING );
-    
-    glDisable( GL_DEPTH_TEST );
-    glDisable( GL_LIGHTING );
-    
-    // Push back the current matrices and go orthographic for background rendering.
-    glMatrixMode( GL_PROJECTION );
-//    glPushMatrix();
-    glLoadIdentity();
-    glOrtho( 0, 640, 480, 0, -1, 1 );  //or whatever size you want
-    
-    glMatrixMode( GL_MODELVIEW );
-//    glPushMatrix();
-    glLoadIdentity();
-    
-    //build the background
-    glBindTexture(GL_TEXTURE_2D, texId);		// Select Our Texture
-    glBegin(GL_QUADS);				// Draw The Quad
-    glColor3f( 1.0, 1.0, 1.0 );
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, float(480), 0.0f);		// Bottom Left
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( float(640), float(480), 0.0f);				// Bottom Right
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( float(640), 0.0f, 0.0f);				// Top Right
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 0.0f, 0.0f);				// Top Left
-    glEnd();										// Done Drawing The Quad
-    
-    
-    // Pop everything back to what ever it was set to before we started
-    
-    glMatrixMode( GL_PROJECTION );
-//    glPopMatrix();
-    
-    glMatrixMode( GL_MODELVIEW );
-//    glPopMatrix();
-    
-//    glPopAttrib();
+    //TODO:
 }
 
 void ImageViewerOpenGL::draw()
@@ -223,10 +158,11 @@ void ImageViewerOpenGL::draw()
 //    drawFullScreenTex();
 //    return;
 
+    //Fixing camera movement, keeping it at origin
     GLdouble cameraMatrix[16];
-    camera()->getModelViewMatrix(cameraMatrix);
-    printf("Cam translation: (%f, %f, %f)\n", cameraMatrix[12],
-           cameraMatrix[13], cameraMatrix[14]);
+//    camera()->getModelViewMatrix(cameraMatrix);
+//    printf("Cam translation: (%f, %f, %f)\n", cameraMatrix[12],
+//           cameraMatrix[13], cameraMatrix[14]);
     
     cameraMatrix[0] = cameraMatrix[5] = cameraMatrix[10] = cameraMatrix[15] = 1.f;
     cameraMatrix[1] = cameraMatrix[2] = cameraMatrix[3] = cameraMatrix[6] = cameraMatrix[7] = cameraMatrix[8] = cameraMatrix[9] = 0.f;
@@ -242,7 +178,8 @@ void ImageViewerOpenGL::draw()
 
     // Render a color-cube consisting of 6 quads with different colors
 //    glLoadIdentity();                 // Reset the model-view matrix
-    glPushMatrix();
+//    glPushMatrix();
+    glLoadIdentity();
 //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
     glTranslatef(0.f, 0.0f, -80.0f);
     
@@ -267,15 +204,21 @@ void ImageViewerOpenGL::draw()
     glVertex3f( a*4, -a*3, a);
     glEnd();
 
-    glPopMatrix();
+//    glPopMatrix();
     
     
     //Draw object
     
-    glPushMatrix();
+//    glPushMatrix();
+        glLoadIdentity();
     //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
 //    glLoadMatrixd(cameraMatrix);
-    glTranslatef(0.f, 0.0f, -7.0f);
+    
+    float translationOffset[] = {0.f, 0.f, -5.f};
+    translationOffset[0] += camToWorld.translation().x()*10.f;
+    translationOffset[1] += camToWorld.translation().x()*10.f;
+    translationOffset[2] += camToWorld.translation().x()*10.f;
+    glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
     glRotatef(33.f, 0.f, 1.f, 0.f);
 
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
@@ -323,7 +266,7 @@ void ImageViewerOpenGL::draw()
     glVertex3f(1.0f, -1.0f, -1.0f);
 
     glEnd();  // End of drawing color-cube
-    glPopMatrix();
+//    glPopMatrix();
 
     
 //    // Render a pyramid consists of 4 triangles
