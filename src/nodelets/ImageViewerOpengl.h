@@ -71,6 +71,8 @@ private:
 
     int id;
     double time;
+    
+    boost::mutex image_mutex_;
 
 };
 

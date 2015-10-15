@@ -488,6 +488,7 @@ void ImageViewerOpenGL::draw()
     // Draw the webcam texture
     // Note: Window co-ordinates origin is top left, texture co-ordinate origin is bottom left.
     
+//    image_mutex_.lock();//TODO There's a flicker in the webcam feed once in a while, probably webcam texture gets updated by the opencv bridge thread
     // Front facing texture
     glBindTexture(GL_TEXTURE_2D, texId);
     
@@ -504,7 +505,7 @@ void ImageViewerOpenGL::draw()
     glTexCoord2f(1, 1);
     glVertex3f( a*4, -a*3, a);
     glEnd();
-
+    
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -531,6 +532,8 @@ void ImageViewerOpenGL::draw()
     glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
 
     drawFullScreenTex();
+//    image_mutex_.unlock();
+
     return;
     
     //Local Rot
