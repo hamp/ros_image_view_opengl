@@ -283,7 +283,7 @@ ImageViewerOpenGL::ImageViewerOpenGL()
     // is specified, we try to locate one of the more expressive test
     // models from the repository (/models-nonbsd may be missing in
     // some distributions so we need a fallback from /models!).
-    if( 0 != loadasset( "/Users/kaushikdas/Downloads/f209638111b194de38731945a6e74476/Chair.3DS")) {
+    if( 0 != loadasset( "/Users/kaushikdas/Work/Projects/SpacesTargetUnity5/Assets/Try&Buy3Dmodels/BlairArmChair/BlairArmChair.FBX")) {
         if( (0 != loadasset( "../../../../test/models-nonbsd/X/dwarf.x") && 0 != loadasset( "../../test/models/X/Testwuson.X"))) {
             printf("could not load model");
         }
@@ -404,21 +404,23 @@ void ImageViewerOpenGL::drawFullScreenTex()
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+//    glLoadIdentity();
+    
 //    gluLookAt(0.f,0.f,3.f,0.f,0.f,-5.f,0.f,1.f,0.f);
 //    
     // rotate it around the y axis
-    glRotatef(_rotVal,0.f,1.f,0.f);
+//    glRotatef(_rotVal,0.f,1.f,0.f);
 
     // scale the whole asset to fit into our view frustum
     tmp = scene_max.x-scene_min.x;
     tmp = aisgl_max(scene_max.y - scene_min.y,tmp);
     tmp = aisgl_max(scene_max.z - scene_min.z,tmp);
-    tmp = 1.f / tmp;
+    tmp = 1.5f / tmp;
     glScalef(tmp, tmp, tmp);
     
 //    // center the model
 //    glTranslatef( -scene_center.x, -scene_center.y, -scene_center.z );
+    glRotatef(90.f, 1.f, 0.f, 0.f);
     
     // if the display list has not been made yet, create a new one and
     // fill it with scene contents
@@ -478,6 +480,10 @@ void ImageViewerOpenGL::draw()
 //    glTranslated(-cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]);
     glTranslatef(0.f, 0.0f, -52.0f);
     
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    
     glEnable(GL_TEXTURE_2D);
     // Draw the webcam texture
     // Note: Window co-ordinates origin is top left, texture co-ordinate origin is bottom left.
@@ -500,6 +506,10 @@ void ImageViewerOpenGL::draw()
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    glEnable(GL_COLOR_MATERIAL);
     
 //    // Free the texture memory
 //    glDeleteTextures(1, &texId);
@@ -512,7 +522,7 @@ void ImageViewerOpenGL::draw()
     glLoadIdentity();
 //    glLoadMatrixd(cameraMatrix);
     
-    float translationOffset[] = {0.f, -1.f, -1.5f};
+    float translationOffset[] = {0.f, -1.65f, -1.75f};
     translationOffset[0] -= camToWorld.translation().x()*1.f;
     translationOffset[1] += camToWorld.translation().y()*1.f;
     translationOffset[2] += camToWorld.translation().z()*1.f;
@@ -521,6 +531,7 @@ void ImageViewerOpenGL::draw()
     glTranslatef(translationOffset[0], translationOffset[1], translationOffset[2]);
 
     drawFullScreenTex();
+    return;
     
     //Local Rot
     glRotatef(33.f, 0.f, 1.f, 0.f);
